@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+}
+<div class="row justify-content-center mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white text-center">
+            <h4 class="mb-0">Acceso Denegado</h4>
+        </div>
+        <div class="card-body text-center">
+            <h5 class="mb-3">No tienes permisos para acceder a esta página.</h5>
+            <p>
+                Usuario:
+                <strong>@User.Identity?.Name</strong>
+            </p>
+            <p>
+                Rol actual:
+                <strong>@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</strong>
+            </p>
+            <hr />
+            <p class="text-muted">Tu rol no tiene autorizacion para realizar esta acción.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+</div>

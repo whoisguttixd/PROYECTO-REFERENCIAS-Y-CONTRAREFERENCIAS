@@ -1,0 +1,86 @@
+@model PROYECTO_REFERENCIAS.Models.EstablecimientoSalud
+@{
+    ViewData["Title"] = "Detalles del Establecimiento";
+}
+
+<a asp-controller="EstablecimientoSalud" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver
+</a>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">@Model.NombreCompleto</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="small text-muted">Código</div>
+                <div class="fw-semibold">@Model.Codigo</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Tipo</div>
+                <div class="fw-semibold">@Model.TipoEstablecimiento</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Red de Salud</div>
+                <div class="fw-semibold">@Model.RedSalud</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Ubicación</div>
+                <div class="fw-semibold">@Model.Ubicacion</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Teléfono</div>
+                <div class="fw-semibold">@Model.Telefono</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Representante Legal</div>
+                <div class="fw-semibold">@Model.RepresentanteLegal</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Especialidades Asignadas (N:M)</h5>
+    <a asp-controller="EstablecimientoSalud" asp-action="AsignarEspecialidades" asp-route-id="@Model.IdEstablecimiento" class="btn btn-primary">
+        Asignar
+    </a>
+</div>
+
+@if ((Model.EstablecimientoEspecialidades?.Count ?? 0) == 0)
+{
+    <div class="alert alert-info">No hay especialidades asignadas.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Especialidad</th>
+                <th>Capacidad</th>
+                <th>Horario</th>
+                <th>Observación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ee in Model?.EstablecimientoEspecialidades ?? new List<PROYECTO_REFERENCIAS.Models.EstablecimientoEspecialidad>())
+            {
+                <tr>
+                    <td>@ee.Especialidad?.Nombre</td>
+                    <td>@ee.CapacidadDisponible</td>
+                    <td>@ee.HorarioAtencion</td>
+                    <td>@(string.IsNullOrWhiteSpace(ee.ObservacionCapacidad) ? "-" : ee.ObservacionCapacidad)</td>
+                    <td>
+                        <form asp-controller="EstablecimientoSalud" asp-action="QuitarEspecialidad" method="post" class="d-inline">
+                            <input type="hidden" name="idEstablecimiento" value="@Model.IdEstablecimiento" />
+                            <input type="hidden" name="idEspecialidad" value="@ee.IdEspecialidad" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('¿Quitar esta especialidad del establecimiento?');">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

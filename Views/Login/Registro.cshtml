@@ -1,0 +1,44 @@
+﻿@model PROYECTO_REFERENCIAS.ViewModels.UsuarioVM;
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Registro</title>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <div class="row mt-5 justify-content-center">
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-header">
+                        Registrarse
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Login" asp-action="Registro" method="post" autocomplete="off">
+                            <input class="form-control mb-3" type="text" placeholder="Nombre Usuario" asp-for="NomUsuario"/>
+                            <input class="form-control mb-3" type="email" placeholder="Correo" asp-for="Correo"/>
+                            <input class="form-control mb-3" type="password" placeholder="Contraseña" asp-for="Password"/>
+                            <input class="form-control mb-3" type="password" placeholder="Repite Contraseña" asp-for="RepPassword" />
+                            <input class="form-control mb-3" type="number" placeholder="Telefono" asp-for="Telefono"/>
+                            <select class="form-select mb-3" asp-for="IdRol" asp-items="@(new SelectList(ViewBag.Roles, "IdRol", "NomRol"))">
+                                <option value="">Seleccione un Rol</option>
+                            </select>
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-primary" type="submit">Registrarse</button>
+                            </div>
+                        </form>
+                        @if (ViewData["Mensaje"] != null)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @ViewData["Mensaje"]
+                                </div>
+                            }
+                        ¿Ya tienes una cuenta? <a asp-controller="Login" asp-action="Login">Iniciar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>

@@ -1,0 +1,105 @@
+@model PROYECTO_REFERENCIAS.ViewModels.Dashboard.IndicadoresViewModel
+@{
+    ViewData["Title"] = "Dashboard Ejecutivo del HRC";
+}
+
+<a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver a la bandeja
+</a>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+                <h2 class="text-primary mb-0">@Model.TotalHoy</h2>
+                <div class="text-muted small">Registradas Hoy</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+                <h2 class="text-secondary mb-0">@Model.TotalSemana</h2>
+                <div class="text-muted small">Registradas Semana</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+                <h2 class="text-warning mb-0">@Model.EmergenciaCritica</h2>
+                <div class="text-muted small">Emergencia / Crítica</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card">
+            <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+                <h2 class="text-info mb-0">@Model.UrgenciaMayor</h2>
+                <div class="text-muted small">Urgencia Mayor</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Indicadores por Estado</h5>
+            </div>
+            <div class="card-body">
+                @Html.Raw(Model.RenderEstado)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Indicadores por Prioridad</h5>
+            </div>
+            <div class="card-body">
+                @Html.Raw(Model.RenderPrioridad)
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Referencia por Red de Salud (Cajamarca y provincias)</h5>
+            </div>
+            <div class="card-body">
+                @Html.Raw(Model.RenderRed)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Estado de las Referencias</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Estado</th>
+                    <th>Cantidad</th>
+                    <th>% Semana</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge bg-secondary">Registrada</span></td>
+                    <td>@Model.TotalSemana - ( @Model.EnEvaluacion + @Model.Aceptadas + @Model.Observadas + @Model.Rechazadas + @Model.Contrareferidas )</td>
+                    <td>@((Model.TotalSemana == 0 ? 0 : ((Model.TotalSemana - (Model.EnEvaluacion + Model.Aceptadas + Model.Observadas + Model.Rechazadas + Model.Contrareferidas)) * 100 / Model.TotalSemana)) )%</td>
+                </tr>
+                <tr><td><span class="badge bg-warning text-dark">En Evaluación</span></td><td>@Model.EnEvaluacion</td><td>@(Model.TotalSemana == 0 ? 0 : (Model.EnEvaluacion * 100 / Model.TotalSemana))%</td></tr>
+                <tr><td><span class="badge bg-success">Aceptada</span></td><td>@Model.Aceptadas</td><td>@(Model.TotalSemana == 0 ? 0 : (Model.Aceptadas * 100 / Model.TotalSemana))%</td></tr>
+                <tr><td><span class="badge bg-info text-dark">Observada</span></td><td>@Model.Observadas</td><td>@(Model.TotalSemana == 0 ? 0 : (Model.Observadas * 100 / Model.TotalSemana))%</td></tr>
+                <tr><td><span class="badge bg-danger">Rechazada</span></td><td>@Model.Rechazadas</td><td>@(Model.TotalSemana == 0 ? 0 : (Model.Rechazadas * 100 / Model.TotalSemana))%</td></tr>
+                <tr><td><span class="badge bg-primary">Contrareferida</span></td><td>@Model.Contrareferidas</td><td>@(Model.TotalSemana == 0 ? 0 : (Model.Contrareferidas * 100 / Model.TotalSemana))%</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

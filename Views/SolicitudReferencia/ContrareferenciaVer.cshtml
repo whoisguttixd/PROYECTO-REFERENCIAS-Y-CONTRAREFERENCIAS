@@ -1,0 +1,47 @@
+@model PROYECTO_REFERENCIAS.Models.SolicitudReferencia
+@{
+    var solicitud = Model;
+}
+
+<a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver a la bandeja
+</a>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Contra-referencia: @solicitud.NumeroReferencia</h5>
+    </div>
+    <div class="card-body">
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <p><strong>Paciente:</strong> @(solicitud.Paciente != null ? $"{solicitud.Paciente.Apellidos}, {solicitud.Paciente.Nombres} (DNI: {solicitud.Paciente.Dni})" : "-")</p>
+                <p><strong>Establecimiento de Origen:</strong> @solicitud.EstablecimientoOrigen?.NombreCompleto</p>
+                <p><strong>Establecimiento de Destino:</strong> @solicitud.EstablecimientoDestino?.NombreCompleto</p>
+                <p><strong>Estado:</strong> @solicitud.Estado</p>
+            </div>
+        </div>
+
+        @if (solicitud.Contrareferencia != null)
+        {
+            var c = solicitud.Contrareferencia;
+            <div class="card bg-light border-success border-opacity-25 mb-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">Contra-referencia emitida</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fecha de emisión:</strong> @c.FechaEmision.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Resultado:</strong> @c.Resultado</p>
+                    <p><strong>Evolución clínica:</strong> @(string.IsNullOrWhiteSpace(c.EvolucionClinica) ? "-" : c.EvolucionClinica)</p>
+                    <p><strong>Tipo de egreso:</strong> @c.TipoEgreso</p>
+                    <p><strong>Indicación al centro de origen:</strong> @c.IndicacionCentroOrigen</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                Esta referencia aún no tiene una contra-referencia asociada.
+            </div>
+        }
+    </div>
+</div>

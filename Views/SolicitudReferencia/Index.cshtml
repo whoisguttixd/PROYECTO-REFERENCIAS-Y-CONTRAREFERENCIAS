@@ -1,0 +1,130 @@
+@model IEnumerable<PROYECTO_REFERENCIAS.Models.SolicitudReferencia>
+@{
+    ViewData["Title"] = "Bandeja General de Referencias";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+    <div>
+        <a asp-controller="SolicitudReferencia" asp-action="Dashboard" class="btn btn-dark">
+            Panel de Control
+        </a>
+        <a asp-controller="SolicitudReferencia" asp-action="Crear" class="btn btn-primary">
+            Nueva Referencia
+        </a>
+    </div>
+</div>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Estado</label>
+        <select class="form-select" name="estado" asp-items="new SelectList(ViewBag.Estados)">
+            <option value="">Todos los estados</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Prioridad</label>
+        <select class="form-select" name="prioridad" asp-items="new SelectList(ViewBag.Prioridades)">
+            <option value="">Todas las prioridades</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Establecimiento destino</label>
+        <select class="form-select" name="idDestino" asp-items="new SelectList(ViewBag.Destinos, nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.IdEstablecimiento), nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.NombreCompleto))">
+            <option value="">Todos los destinos</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Búsqueda</label>
+        <input class="form-control" type="search" name="busqueda" value="@ViewBag.Busqueda" placeholder="Ref, paciente, origen..." />
+    </div>
+    <div class="col-md-1">
+        <button class="btn btn-primary w-100" type="submit">Buscar</button>
+    </div>
+    @if (ViewBag.HayFiltros == true)
+    {
+        <div class="col-12">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Limpiar filtros</a>
+        </div>
+    }
+</form>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-secondary">No hay solicitudes de referencia registradas.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>N° Referencia</th>
+                <th>Paciente</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                var estadoClass = s.Estado switch
+                {
+                    EstadoReferencia.Registrada => "bg-secondary",
+                    EstadoReferencia.EnEvaluacion => "bg-warning text-dark",
+                    EstadoReferencia.Aceptada => "bg-success",
+                    EstadoReferencia.Observada => "bg-info text-dark",
+                    EstadoReferencia.Rechazada => "bg-danger",
+                    EstadoReferencia.Contrareferida => "bg-primary",
+                    _ => "bg-secondary"
+                };
+
+                <tr>
+                    <td><span class="fw-semibold codigo-clinico">@s.NumeroReferencia</span></td>
+                    <td>
+                        @if (s.Paciente != null)
+                        {
+                            <div class="fw-medium">@s.Paciente.Apellidos, @s.Paciente.Nombres</div>
+                            <small class="text-muted codigo-clinico">DNI: @s.Paciente.Dni</small>
+                        }
+                    </td>
+                    <td>@s.EstablecimientoOrigen?.Nombre</td>
+                    <td>@s.EstablecimientoDestino?.Nombre</td>
+                    <td><span class="badge @estadoClass">@s.Estado.GetDisplayName()</span></td>
+                    <td>
+                        @{
+                            var prioridadClass = s.Prioridad switch
+                            {
+                                PrioridadReferencia.EmergenciaCritica => "bg-danger",
+                                PrioridadReferencia.UrgenciaMayor => "bg-warning text-dark",
+                                PrioridadReferencia.ConsultaExterna => "bg-info text-dark",
+                                _ => "bg-secondary"
+                            };
+                        }
+                        <span class="badge @prioridadClass">@s.Prioridad.GetDisplayName()</span>
+                    </td>
+                    <td class="codigo-clinico">@s.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                    <td class="text-nowrap">
+                        <a asp-controller="SolicitudReferencia" asp-action="Evaluar" asp-route-id="@s.IdReferencia" class="btn btn-sm btn-outline-primary">Evaluar</a>
+                        @if (s.PuedeContrareferirse)
+                        {
+                            <a asp-controller="SolicitudReferencia" asp-action="ContrareferenciaEmitir" asp-route-id="@s.IdReferencia" class="btn btn-sm btn-outline-success">Contra-ref</a>
+                        }
+                        <a asp-controller="SolicitudReferencia" asp-action="ContrareferenciaVer" asp-route-id="@s.IdReferencia" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

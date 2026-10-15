@@ -1,0 +1,91 @@
+@model PROYECTO_REFERENCIAS.ViewModels.ContrareferenciaVM
+@{
+    var solicitud = ViewBag.Solicitud as SolicitudReferencia;
+    var yaTiene = ViewBag.YaTieneContrareferencia as bool? ?? false;
+}
+
+<a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver a la bandeja
+</a>
+
+<a asp-controller="SolicitudReferencia" asp-action="Evaluar" asp-route-id="@Model.IdReferencia" class="btn btn-outline-primary mb-2">
+    Regresar a evaluación
+</a>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Emitir Contra-referencia</h5>
+        <small class="text-muted">Relación 1:1 con SolicitudReferencia</small>
+    </div>
+    <div class="card-body">
+        @if (ViewData["Mensaje"] != null)
+        {
+            <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+        }
+
+        <div class="alert alert-light border">
+            <strong>Referencia:</strong> @Model.NumeroReferencia<br />
+            <strong>Paciente:</strong> @(solicitud?.Paciente != null ? $"{solicitud.Paciente.Apellidos}, {solicitud.Paciente.Nombres} (DNI: {solicitud.Paciente.Dni})" : "-")<br />
+            <strong>Origen:</strong> @solicitud?.EstablecimientoOrigen?.NombreCompleto<br />
+            <strong>Destino:</strong> @solicitud?.EstablecimientoDestino?.NombreCompleto
+        </div>
+
+        <form asp-controller="SolicitudReferencia" asp-action="ContrareferenciaEmitir" method="post">
+            <input type="hidden" asp-for="IdReferencia" />
+            <input type="hidden" asp-for="IdContrareferencia" />
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Fecha de Emisión <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="FechaEmision" type="date" />
+                    <span asp-validation-for="FechaEmision" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tipo de Egreso</label>
+                    <select class="form-select" asp-for="TipoEgreso">
+                        <option value="Alta médica">Alta médica</option>
+                        <option value="Alta con derivación">Alta con derivación</option>
+                        <option value="Fallecido">Fallecido</option>
+                        <option value="Traslado">Traslado</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <span asp-validation-for="TipoEgreso" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Resultado <span class="text-danger">*</span></label>
+                    <textarea class="form-control" asp-for="Resultado" rows="3" placeholder="Resultado del proceso de atención..."></textarea>
+                    <span asp-validation-for="Resultado" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Evolución Clínica</label>
+                    <textarea class="form-control" asp-for="EvolucionClinica" rows="2" placeholder="Evolución del paciente..."></textarea>
+                    <span asp-validation-for="EvolucionClinica" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Indicación al Centro de Origen <span class="text-danger">*</span></label>
+                    <textarea class="form-control" asp-for="IndicacionCentroOrigen" rows="3" placeholder="Indicaciones para el centro de salud de origen..."></textarea>
+                    <span asp-validation-for="IndicacionCentroOrigen" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 d-grid gap-2">
+                    <button type="submit" class="btn btn-success">
+                        Guardar Contra-referencia
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        @if (yaTiene)
+        {
+            <hr class="my-3" />
+            <small class="text-muted">Esta referencia ya cuenta con una contra-referencia asociada. Se guardará como actualización.</small>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

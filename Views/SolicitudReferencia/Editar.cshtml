@@ -1,0 +1,366 @@
+@model PROYECTO_REFERENCIAS.ViewModels.SolicitudReferenciaVM
+@{
+    ViewData["Title"] = Model.IdReferencia > 0 ? "Editar Referencia" : "Nueva Solicitud de Referencia";
+}
+
+<a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver a la bandeja
+</a>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@ViewData["Title"]</h5>
+        <small class="text-muted">Patrón Maestro-Detalle (Semana 9)</small>
+    </div>
+    <div class="card-body">
+        @if (ViewData["Mensaje"] != null)
+        {
+            <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+        }
+
+        <form asp-controller="SolicitudReferencia" asp-action="Crear" method="post" id="formMaestroDetalle">
+            <!-- ===== CABECERA (Maestro) ===== -->
+            <h6 class="fw-bold text-primary">Cabecera de la Solicitud de Referencia</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Número de Referencia <span class="text-danger">*</span></label>
+                    <input class="form-control codigo-clinico" asp-for="NumeroReferencia" placeholder="Ej: HRC-0001" />
+                    <span asp-validation-for="NumeroReferencia" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Prioridad registrada</label>
+                    <select class="form-select" asp-for="Prioridad">
+                        <option value="0">No calculada</option>
+                        <option value="1">Consulta Externa</option>
+                        <option value="2">Urgencia Mayor</option>
+                        <option value="3">Emergencia / Crítica</option>
+                    </select>
+                    <span asp-validation-for="Prioridad" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Prioridad Calculada (Strategy)</label>
+                    <input class="form-control" asp-for="PrioridadCalculada" readonly />
+                    <small class="text-muted">Se calcula automáticamente con el patrón Strategy al guardar.</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de Registro <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="FechaRegistro" type="date" />
+                    <span asp-validation-for="FechaRegistro" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de Derivación <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="FechaDerivacion" type="date" />
+                    <span asp-validation-for="FechaDerivacion" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Requerimiento / Expediente <span class="text-danger">*</span></label>
+                    <input class="form-control codigo-clinico" asp-for="Requerimiento" placeholder="Ej: EXP-1234" />
+                    <span asp-validation-for="Requerimiento" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Paciente <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="IdPaciente" asp-items="new SelectList(Model.Pacientes, nameof(PROYECTO_REFERENCIAS.Models.Paciente.IdPaciente), nameof(PROYECTO_REFERENCIAS.Models.Paciente.NombreCompleto))">
+                        <option value="">-- Seleccione Paciente --</option>
+                    </select>
+                    <span asp-validation-for="IdPaciente" class="text-danger"></span>
+                    @if (!string.IsNullOrWhiteSpace(Model.PacienteDisplay))
+                    {
+                        <small class="text-muted">Paciente seleccionado: <span class="fw-medium">@Model.PacienteDisplay</span></small>
+                    }
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ubicación en Urgencia</label>
+                    <input class="form-control" asp-for="UbicacionUrgencia" placeholder="Ej: Urgencias, UCI..." />
+                    <span asp-validation-for="UbicacionUrgencia" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Médico Solicitante</label>
+                    <select class="form-select" asp-for="IdMedicoSolicitante" asp-items="new SelectList(Model.MedicosSolicitantes, nameof(PROYECTO_REFERENCIAS.Models.PersonalSalud.IdPersonal), nameof(PROYECTO_REFERENCIAS.Models.PersonalSalud.NombreCompleto))">
+                        <option value="">-- Seleccione Médico --</option>
+                    </select>
+                    <span asp-validation-for="IdMedicoSolicitante" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Establecimiento de Origen <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="IdEstablecimientoOrigen" asp-items="new SelectList(Model.EstablecimientosOrigen, nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.IdEstablecimiento), nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.NombreCompleto))">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="IdEstablecimientoOrigen" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Establecimiento de Destino <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="IdEstablecimientoDestino" asp-items="new SelectList(Model.EstablecimientosDestino, nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.IdEstablecimiento), nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.NombreCompleto))">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="IdEstablecimientoDestino" class="text-danger"></span>
+                    <small class="text-muted">Debe ser distinto al origen.</small>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Motivo de la Referencia <span class="text-danger">*</span></label>
+                    <textarea class="form-control" asp-for="Motivo" rows="2" placeholder="Motivo clínico de la derivación..."></textarea>
+                    <span asp-validation-for="Motivo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Orden Médica</label>
+                    <textarea class="form-control" asp-for="OrdenMedica" rows="2" placeholder="Estudios y/o tratamiento solicitado..."></textarea>
+                    <span asp-validation-for="OrdenMedica" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Observación General</label>
+                    <textarea class="form-control" asp-for="ObservacionGeneral" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                    <span asp-validation-for="ObservacionGeneral" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- ===== SIGNOS VITALES ===== -->
+            <h6 class="fw-bold text-primary">Signos Vitales</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6">
+                    <label class="form-label small">Presión Arterial (mmHg)</label>
+                    <input class="form-control codigo-clinico" asp-for="PresionArterial" placeholder="120/80" />
+                    <span asp-validation-for="PresionArterial" class="text-danger"></span>
+                </div>
+                <div class="col-md-2 col-6">
+                    <label class="form-label small">F. Cardíaca (lpm)</label>
+                    <input class="form-control codigo-clinico" asp-for="FrecuenciaCardiaca" type="number" min="0" max="300" />
+                    <span asp-validation-for="FrecuenciaCardiaca" class="text-danger"></span>
+                </div>
+                <div class="col-md-2 col-6">
+                    <label class="form-label small">F. Respiratoria (rpm)</label>
+                    <input class="form-control codigo-clinico" asp-for="FrecuenciaRespiratoria" type="number" min="0" max="100" />
+                    <span asp-validation-for="FrecuenciaRespiratoria" class="text-danger"></span>
+                </div>
+                <div class="col-md-2 col-6">
+                    <label class="form-label small">Temperatura (°C)</label>
+                    <input class="form-control codigo-clinico" asp-for="Temperatura" type="number" step="0.1" min="30" max="45" />
+                    <span asp-validation-for="Temperatura" class="text-danger"></span>
+                </div>
+                <div class="col-md-1 col-6">
+                    <label class="form-label small">SpO2 (%)</label>
+                    <input class="form-control codigo-clinico" asp-for="SaturacionOxigeno" type="number" min="0" max="100" />
+                    <span asp-validation-for="SaturacionOxigeno" class="text-danger"></span>
+                </div>
+                <div class="col-md-1 col-6">
+                    <label class="form-label small">Peso (kg)</label>
+                    <input class="form-control codigo-clinico" asp-for="PesoKg" type="number" step="0.01" min="0" max="400" />
+                    <span asp-validation-for="PesoKg" class="text-danger"></span>
+                </div>
+                <div class="col-md-1 col-6">
+                    <label class="form-label small">Talla (cm)</label>
+                    <input class="form-control codigo-clinico" asp-for="TallaCm" type="number" step="0.01" min="0" max="300" />
+                    <span asp-validation-for="TallaCm" class="text-danger"></span>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- ===== DETALLES (Detalle - Maestro-Detalle) ===== -->
+            <h6 class="fw-bold text-primary">
+                Detalles de la Referencia
+                <span class="text-muted fw-normal">(CIE-10, diagnóstico, tipo, examen auxiliar y hallazgos)</span>
+                <button type="button" class="btn btn-outline-primary btn-sm ms-2" id="btnAgregarDetalle">
+                    + Agregar Detalle
+                </button>
+            </h6>
+
+            <div class="row g-3 detalles-container" id="detallesContainer">
+                @for (var i = 0; i < Model.Detalles.Count; i++)
+                {
+                    var detalle = Model.Detalles[i];
+                    <div class="col-12 detalle-fila">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Código CIE-10 <span class="text-danger">*</span></label>
+                                        <input class="form-control codigo-clinico" type="text" name="Detalles[@i].CodigoCie10" value="@detalle.CodigoCie10" data-val="true" data-val-required="El código CIE-10 es obligatorio" data-val-regex="Formato CIE-10 inválido (ej. A00, A00.0, A00B)" data-val-regex-pattern="^[A-Z][0-9]{2}(\.[0-9]{1,2})?[A-Z]?$" />
+                                        <span class="text-danger small" data-valmsg-for="Detalles[@i].CodigoCie10" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Diagnóstico <span class="text-danger">*</span></label>
+                                        <input class="form-control" type="text" maxlength="300" name="Detalles[@i].Diagnostico" value="@detalle.Diagnostico" data-val="true" data-val-required="El diagnóstico es obligatorio" />
+                                        <span class="text-danger small" data-valmsg-for="Detalles[@i].Diagnostico" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Tipo de Diagnóstico</label>
+                                        <select class="form-select form-select-sm" name="Detalles[@i].TipoDiagnostico">
+                                            <option value="Presuntivo" selected="@(detalle.TipoDiagnostico != "Definitivo")">Presuntivo</option>
+                                            <option value="Definitivo" selected="@(detalle.TipoDiagnostico == "Definitivo")">Definitivo</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Tipo de Apoyo <span class="text-danger">*</span></label>
+                                        <select class="form-select form-select-sm" name="Detalles[@i].TipoApoyo" data-val="true" data-val-required="El tipo de apoyo es obligatorio">
+                                            <option value="">-- Seleccione --</option>
+                                            <option value="Examen físico" selected="@(detalle.TipoApoyo == "Examen físico")">Examen físico</option>
+                                            <option value="Examen complementario" selected="@(detalle.TipoApoyo == "Examen complementario")">Examen complementario</option>
+                                            <option value="Laboratorio" selected="@(detalle.TipoApoyo == "Laboratorio")">Laboratorio</option>
+                                            <option value="Imagenología" selected="@(detalle.TipoApoyo == "Imagenología")">Imagenología</option>
+                                            <option value="Otros" selected="@(detalle.TipoApoyo == "Otros")">Otros</option>
+                                        </select>
+                                        <span class="text-danger small" data-valmsg-for="Detalles[@i].TipoApoyo" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="QuitarDetalle(this)" title="Quitar detalle">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Descripción del Examen / Laboratorio</label>
+                                        <input class="form-control" type="text" maxlength="200" name="Detalles[@i].DescripcionApoyo" value="@detalle.DescripcionApoyo" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Examen Auxiliar Adjunto</label>
+                                        <input class="form-control" type="text" maxlength="150" name="Detalles[@i].ExamenAuxiliar" value="@detalle.ExamenAuxiliar" placeholder="Ej: Rx tórax PA, informe N° 123" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Signos de Alarma</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="Detalles[@i].SignosAlarma" value="true" @(detalle.SignosAlarma ? "checked" : "") />
+                                            <label class="form-check-label small">Activar</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small">Prioridad del Detalle</label>
+                                        <select class="form-select form-select-sm" name="Detalles[@i].PrioridadDetalle">
+                                            <option value="0">No calculada</option>
+                                            <option value="1">Consulta Externa</option>
+                                            <option value="2">Urgencia Mayor</option>
+                                            <option value="3">Emergencia / Crítica</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Hallazgos Clínicos</label>
+                                        <textarea class="form-control" rows="1" maxlength="600" name="Detalles[@i].HallazgosClinicos">@detalle.HallazgosClinicos</textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Observaciones</label>
+                                        <textarea class="form-control" rows="1" maxlength="600" name="Detalles[@i].Observaciones">@detalle.Observaciones</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- ===== BOTONES ===== -->
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Registrar Referencia
+                </button>
+            </div>
+
+            <p class="text-muted mt-3 small">
+                La cabecera y los detalles se guardan en una única transacción (patrón Unit of Work). La prioridad final se calcula con el patrón Strategy.
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('btnAgregarDetalle').addEventListener('click', function () {
+            var container = document.getElementById('detallesContainer');
+            var indice = container.querySelectorAll('.detalle-fila').length;
+
+            var fila = document.createElement('div');
+            fila.className = 'col-12 detalle-fila';
+            fila.innerHTML = `
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label small">Código CIE-10 <span class="text-danger">*</span></label>
+                                <input class="form-control codigo-clinico" type="text" name="Detalles[${indice}].CodigoCie10" value="" data-val="true" data-val-required="El código CIE-10 es obligatorio" data-val-regex="Formato CIE-10 inválido (ej. A00, A00.0, A00B)" data-val-regex-pattern="^[A-Z][0-9]{2}(\.[0-9]{1,2})?[A-Z]?$" />
+                                <span class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Diagnóstico <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" maxlength="300" name="Detalles[${indice}].Diagnostico" value="" data-val="true" data-val-required="El diagnóstico es obligatorio" />
+                                <span class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Tipo de Diagnóstico</label>
+                                <select class="form-select form-select-sm" name="Detalles[${indice}].TipoDiagnostico">
+                                    <option value="Presuntivo">Presuntivo</option>
+                                    <option value="Definitivo">Definitivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Tipo de Apoyo <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm" name="Detalles[${indice}].TipoApoyo" data-val="true" data-val-required="El tipo de apoyo es obligatorio">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Examen físico">Examen físico</option>
+                                    <option value="Examen complementario">Examen complementario</option>
+                                    <option value="Laboratorio">Laboratorio</option>
+                                    <option value="Imagenología">Imagenología</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="QuitarDetalle(this)" title="Quitar detalle">Eliminar</button>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Descripción del Examen / Laboratorio</label>
+                                <input class="form-control" type="text" maxlength="200" name="Detalles[${indice}].DescripcionApoyo" value="" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Examen Auxiliar Adjunto</label>
+                                <input class="form-control" type="text" maxlength="150" name="Detalles[${indice}].ExamenAuxiliar" value="" placeholder="Ej: Rx tórax PA, informe N° 123" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Signos de Alarma</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="Detalles[${indice}].SignosAlarma" value="true" />
+                                    <label class="form-check-label small">Activar</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small">Prioridad del Detalle</label>
+                                <select class="form-select form-select-sm" name="Detalles[${indice}].PrioridadDetalle">
+                                    <option value="0">No calculada</option>
+                                    <option value="1">Consulta Externa</option>
+                                    <option value="2">Urgencia Mayor</option>
+                                    <option value="3">Emergencia / Crítica</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small">Hallazgos Clínicos</label>
+                                <textarea class="form-control" rows="1" maxlength="600" name="Detalles[${indice}].HallazgosClinicos"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small">Observaciones</label>
+                                <textarea class="form-control" rows="1" maxlength="600" name="Detalles[${indice}].Observaciones"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(fila);
+
+            // Re-parsear la validación unobtrusive para incluir la nueva fila dinámica
+            var form = document.getElementById('formMaestroDetalle');
+            if (form && window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {
+                var $form = jQuery(form);
+                $form.removeData('validator');
+                $form.removeData('unobtrusiveValidation');
+                jQuery.validator.unobtrusive.parse($form);
+            }
+        });
+
+        function QuitarDetalle(btn) {
+            event.preventDefault();
+            var fila = btn.closest('.detalle-fila');
+            if (fila && confirm('¿Quitar este detalle de la referencia?')) {
+                fila.remove();
+            }
+        }
+    </script>
+}

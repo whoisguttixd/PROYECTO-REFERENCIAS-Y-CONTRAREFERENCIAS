@@ -1,0 +1,99 @@
+@model PROYECTO_REFERENCIAS.Models.PersonalSalud
+@{
+    var establecimientos = ViewBag.Establecimientos as System.Collections.Generic.IList<PROYECTO_REFERENCIAS.Models.EstablecimientoSalud> ?? new System.Collections.Generic.List<PROYECTO_REFERENCIAS.Models.EstablecimientoSalud>();
+    ViewData["Title"] = Model.IdPersonal > 0 ? "Editar Profesional" : "Nuevo Profesional";
+}
+
+<a asp-controller="PersonalSalud" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver
+</a>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">@ViewData["Title"]</h5>
+    </div>
+    <div class="card-body">
+        @if (ViewData["Mensaje"] != null)
+        {
+            <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+        }
+
+        <form asp-controller="PersonalSalud" asp-action="Crear" method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Código Profesional <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Codigo" placeholder="Ej: MED-001" />
+                    <span asp-validation-for="Codigo" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Apellidos" />
+                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Nombres" />
+                    <span asp-validation-for="Nombres" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Colegio Profesional <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="ColegioProfesional">
+                        <option value="">-- Seleccione --</option>
+                        <option value="CPM">Colegio de Médicos de Perú</option>
+                        <option value="CPM-UNSAAC">Colegio de Médicos de la UNSAAC</option>
+                        <option value="CPC">Colegio de Enfermeras de Cajamarca</option>
+                        <option value="CPM-UE">Colegio de Médicos UE</option>
+                    </select>
+                    <span asp-validation-for="ColegioProfesional" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">N° Colegiado <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="NumeroColegiado" />
+                    <span asp-validation-for="NumeroColegiado" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tipo de Personal <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="TipoPersonal">
+                        <option value="">-- Seleccione --</option>
+                        <option value="Médico">Médico</option>
+                        <option value="Enfermera">Enfermera</option>
+                        <option value="Técnico de Enfermería">Técnico de Enfermería</option>
+                        <option value="Laboratorio">Técnico de Laboratorio</option>
+                        <option value="Farmacia">Farmacéutico</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <span asp-validation-for="TipoPersonal" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Establecimiento de Adscripción <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="IdEstablecimiento" asp-items="new SelectList(establecimientos, nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.IdEstablecimiento), nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.NombreCompleto))">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="IdEstablecimiento" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Especialidad Principal</label>
+                    <input class="form-control" asp-for="EspecialidadPrincipal" />
+                    <span asp-validation-for="EspecialidadPrincipal" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">SIP</label>
+                    <input class="form-control" asp-for="Sip" placeholder="SIP-01" />
+                    <span asp-validation-for="Sip" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Guardar Profesional</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

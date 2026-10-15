@@ -1,0 +1,198 @@
+@using PROYECTO_REFERENCIAS.Models
+@model PROYECTO_REFERENCIAS.ViewModels.EvaluarReferenciaVM
+@{
+    var solicitud = ViewBag.Solicitud as SolicitudReferencia;
+    var proximosEstados = ViewBag.ProximosEstados as List<EstadoReferencia> ?? new List<EstadoReferencia>();
+    var estadoActual = ViewBag.EstadoActual as EstadoReferencia? ?? EstadoReferencia.Registrada;
+    var puedeContrareferir = ViewBag.PuedeContrareferir as bool? ?? false;
+    var listaSelect = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>(
+        proximosEstados.Select(est => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+        {
+            Value = est.ToString(),
+            Text = est.GetDisplayName()
+        }));
+
+    string ClaseBadge(EstadoReferencia estado) => estado switch
+    {
+        EstadoReferencia.Registrada => "bg-secondary",
+        EstadoReferencia.EnEvaluacion => "bg-warning text-dark",
+        EstadoReferencia.Aceptada => "bg-success",
+        EstadoReferencia.Observada => "bg-info text-dark",
+        EstadoReferencia.Rechazada => "bg-danger",
+        EstadoReferencia.Contrareferida => "bg-primary",
+        _ => "bg-secondary"
+    };
+}
+
+<a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver a la bandeja
+</a>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Auditoría / Evaluación Médica - <span class="codigo-clinico">@solicitud?.NumeroReferencia</span></h5>
+    </div>
+    <div class="card-body">
+        @if (ViewData["Mensaje"] != null)
+        {
+            <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+        }
+
+        <div class="row g-2 mb-3">
+            <div class="col-md-4"><strong>Paciente:</strong> @(solicitud?.Paciente != null ? $"{solicitud.Paciente.Apellidos}, {solicitud.Paciente.Nombres}" : "-")</div>
+            <div class="col-md-4"><strong>DNI:</strong> <span class="codigo-clinico">@solicitud?.Paciente?.Dni</span></div>
+            <div class="col-md-4"><strong>Médico solicitante:</strong> @(solicitud?.MedicoSolicitante?.NombreCompleto ?? "-")</div>
+            <div class="col-md-4"><strong>Origen:</strong> @solicitud?.EstablecimientoOrigen?.NombreCompleto</div>
+            <div class="col-md-4"><strong>Destino:</strong> @solicitud?.EstablecimientoDestino?.NombreCompleto</div>
+            <div class="col-md-4"><strong>Fecha derivación:</strong> <span class="codigo-clinico">@solicitud?.FechaDerivacion.ToString("dd/MM/yyyy")</span></div>
+        </div>
+
+        <div class="row g-2 mb-3">
+            <div class="col-md-6 col-12">
+                <span class="text-muted">Estado actual:</span>
+                <span class="badge @ClaseBadge(estadoActual)">@estadoActual.GetDisplayName()</span>
+            </div>
+            <div class="col-md-6 col-12">
+                <span class="text-muted">Prioridad calculada:</span>
+                <span class="badge @(solicitud?.PrioridadCalculada switch
+                {
+                    PrioridadReferencia.EmergenciaCritica => "bg-danger",
+                    PrioridadReferencia.UrgenciaMayor => "bg-warning text-dark",
+                    PrioridadReferencia.ConsultaExterna => "bg-info text-dark",
+                    _ => "bg-secondary"
+                })">@(solicitud?.PrioridadCalculada?.GetDisplayName() ?? "No calculada")</span>
+            </div>
+        </div>
+
+        @* Signos vitales *@
+        <div class="card bg-light mb-3">
+            <div class="card-header py-2"><h6 class="mb-0">Signos Vitales</h6></div>
+            <div class="card-body">
+                <div class="row g-2 codigo-clinico">
+                    <div class="col-md-3 col-6"><strong>P.A.:</strong> @(solicitud?.PresionArterial ?? "-") mmHg</div>
+                    <div class="col-md-3 col-6"><strong>F.C.:</strong> @(solicitud?.FrecuenciaCardiaca?.ToString() ?? "-") lpm</div>
+                    <div class="col-md-3 col-6"><strong>F.R.:</strong> @(solicitud?.FrecuenciaRespiratoria?.ToString() ?? "-") rpm</div>
+                    <div class="col-md-3 col-6"><strong>T°:</strong> @(solicitud?.Temperatura?.ToString() ?? "-") °C</div>
+                    <div class="col-md-3 col-6"><strong>SpO2:</strong> @(solicitud?.SaturacionOxigeno?.ToString() ?? "-") %</div>
+                    <div class="col-md-3 col-6"><strong>Peso:</strong> @(solicitud?.PesoKg?.ToString() ?? "-") kg</div>
+                    <div class="col-md-3 col-6"><strong>Talla:</strong> @(solicitud?.TallaCm?.ToString() ?? "-") cm</div>
+                </div>
+            </div>
+        </div>
+
+        @* Motivo / detalle clínico *@
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold text-primary">Motivo de la referencia</h6>
+                <p class="mb-2">@solicitud?.Motivo</p>
+                @if (!string.IsNullOrWhiteSpace(solicitud?.OrdenMedica))
+                {
+                    <small class="text-muted"><strong>Orden médica:</strong> @solicitud.OrdenMedica</small>
+                }
+
+                @if (solicitud?.Detalles?.Any() == true)
+                {
+                    <hr class="my-2" />
+                    <h6 class="fw-bold text-primary">Detalles clínicos (CIE-10)</h6>
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>CIE-10</th>
+                                <th>Diagnóstico</th>
+                                <th>Tipo</th>
+                                <th>Examen auxiliar</th>
+                                <th>Hallazgos</th>
+                                <th>Alarma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in solicitud.Detalles)
+                            {
+                                <tr>
+                                    <td class="codigo-clinico">@d.CodigoCie10</td>
+                                    <td>@d.Diagnostico</td>
+                                    <td>@d.TipoDiagnostico</td>
+                                    <td>@(string.IsNullOrWhiteSpace(d.ExamenAuxiliar) ? "-" : d.ExamenAuxiliar)</td>
+                                    <td>@(string.IsNullOrWhiteSpace(d.HallazgosClinicos) ? "-" : d.HallazgosClinicos)</td>
+                                    <td><span class="badge @(d.SignosAlarma ? "bg-danger" : "bg-secondary")">@(d.SignosAlarma ? "Alarma" : "Sin alarma")</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                @if (!string.IsNullOrWhiteSpace(solicitud?.ObservacionGeneral))
+                {
+                    <hr class="my-2" />
+                    <small class="text-muted"><strong>Observación general:</strong> @solicitud.ObservacionGeneral</small>
+                }
+            </div>
+        </div>
+
+        <h6 class="fw-bold text-primary">Transición de Estado (Máquina de Estados)</h6>
+
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <strong>Estado actual:</strong>
+                        <span class="badge @ClaseBadge(estadoActual)">@estadoActual.GetDisplayName()</span>
+                    </div>
+                    <div class="col">
+                        <strong>Próximos estados permitidos:</strong>
+                        @if (proximosEstados.Any())
+                        {
+                            <span class="badge bg-light text-dark border">@string.Join("  |  ", proximosEstados.Select(est => est.GetDisplayName()))</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No hay transiciones disponibles.</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (proximosEstados.Any())
+        {
+            <form asp-controller="SolicitudReferencia" asp-action="Evaluar" method="post">
+                <input type="hidden" asp-for="IdReferencia" />
+
+                <div class="mb-3">
+                    <label class="form-label">Nuevo Estado <span class="text-danger">*</span></label>
+                    <select class="form-select" asp-for="NuevoEstado" asp-items="listaSelect">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="NuevoEstado" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Observación del Estado</label>
+                    <textarea class="form-control" asp-for="ObservacionEstado" rows="2" placeholder="Observación del médico evaluador..."></textarea>
+                    <span asp-validation-for="ObservacionEstado" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Aprobar Transición</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-secondary">No hay transiciones disponibles para este estado.</div>
+        }
+
+        @if (puedeContrareferir)
+        {
+            <hr class="my-4" />
+            <h6 class="fw-bold text-success">Contra-referencia (1:1)</h6>
+            <p class="text-muted small">Esta referencia puede ser contrareferida al centro de origen.</p>
+            <a asp-controller="SolicitudReferencia" asp-action="ContrareferenciaEmitir" asp-route-id="@solicitud?.IdReferencia" class="btn btn-outline-success">
+                Emitir Contra-referencia
+            </a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

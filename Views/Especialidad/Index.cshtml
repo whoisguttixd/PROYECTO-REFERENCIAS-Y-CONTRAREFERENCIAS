@@ -1,0 +1,74 @@
+@model IEnumerable<PROYECTO_REFERENCIAS.Models.Especialidad>
+@{
+    ViewData["Title"] = "Especialidades";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+    <a asp-controller="Especialidad" asp-action="Crear" class="btn btn-primary">
+        Nueva Especialidad
+    </a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (ViewData["Mensaje"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @ViewData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input class="form-control" type="search" name="filtro" value="@ViewBag.Filtro" placeholder="Código, nombre o descripción" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        @if (!string.IsNullOrWhiteSpace(ViewBag.Filtro))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        }
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay especialidades registradas.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Código CIE-10 / Interno</th>
+                <th>Especialidad</th>
+                <th>Descripción</th>
+                <th>Nivel Atención</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td><span class="fw-semibold">@e.Codigo</span></td>
+                    <td><span class="fw-medium">@e.Nombre</span></td>
+                    <td>@(string.IsNullOrWhiteSpace(e.Descripcion) ? "-" : e.Descripcion)</td>
+                    <td>@e.NivelAtencion</td>
+                    <td>
+                        <a asp-controller="Especialidad" asp-action="Editar" asp-route-id="@e.IdEspecialidad" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <a asp-controller="Especialidad" asp-action="Eliminar" asp-route-id="@e.IdEspecialidad" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar especialidad @e.Nombre?');">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

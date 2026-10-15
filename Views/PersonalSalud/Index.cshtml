@@ -1,0 +1,90 @@
+@model IEnumerable<PROYECTO_REFERENCIAS.Models.PersonalSalud>
+@{
+    ViewData["Title"] = "Personal de Salud";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
+    <a asp-controller="PersonalSalud" asp-action="Crear" class="btn btn-primary">
+        Nuevo Profesional
+    </a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (ViewData["Mensaje"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @ViewData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input class="form-control" type="search" name="filtro" value="@ViewBag.Filtro" placeholder="Código, apellidos, nombres, colegiado o colegio" />
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" name="idEstablecimiento" asp-items="new SelectList(ViewBag.Establecimientos, nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.IdEstablecimiento), nameof(PROYECTO_REFERENCIAS.Models.EstablecimientoSalud.NombreCompleto))" id="idEstablecimiento">
+            <option value="">Todos los establecimientos</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" type="submit">Filtrar</button>
+        @if (ViewBag.HayFiltros == true)
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        }
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay profesionales registrados.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Código</th>
+                <th>Profesional</th>
+                <th>Colegio / N° Colegiado</th>
+                <th>Tipo</th>
+                <th>Establecimiento</th>
+                <th>Especialidad</th>
+                <th>SIP</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td><span class="fw-semibold">@p.Codigo</span></td>
+                    <td>
+                        <div class="fw-medium">@p.Nombres</div>
+                        <small class="text-muted">@p.Apellidos</small>
+                    </td>
+                    <td>
+                        <small>@p.ColegioProfesional - @p.NumeroColegiado</small>
+                    </td>
+                    <td>@p.TipoPersonal</td>
+                    <td>@p.Establecimiento?.NombreCompleto</td>
+                    <td>@p.EspecialidadPrincipal</td>
+                    <td>@p.Sip</td>
+                    <td>
+                        <a asp-controller="PersonalSalud" asp-action="Editar" asp-route-id="@p.IdPersonal" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <a asp-controller="PersonalSalud" asp-action="Eliminar" asp-route-id="@p.IdPersonal" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar profesional @p.Apellidos @p.Nombres?');">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

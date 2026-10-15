@@ -1,0 +1,87 @@
+@model PROYECTO_REFERENCIAS.Models.Paciente
+@{
+    ViewData["Title"] = Model.IdPaciente > 0 ? "Editar Paciente" : "Nuevo Paciente";
+}
+
+<a asp-controller="Paciente" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver
+</a>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">@ViewData["Title"]</h5>
+    </div>
+    <div class="card-body">
+        @if (ViewData["Mensaje"] != null)
+        {
+            <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+        }
+
+        <form asp-controller="Paciente"                    asp-action="@(Model.IdPaciente > 0 ? "Editar" : "Crear")" method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">DNI / RUN <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Dni" />
+                    <span asp-validation-for="Dni" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Código RENAES</label>
+                    <input class="form-control" asp-for="CodigoRenaes" />
+                    <span asp-validation-for="CodigoRenaes" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Apellidos" />
+                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="Nombres" />
+                    <span asp-validation-for="Nombres" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                    <input class="form-control" asp-for="FechaNacimiento" type="date" />
+                    <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Sexo</label>
+                    <select class="form-select" asp-for="Sexo">
+                        <option value="">-- Seleccione --</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                    </select>
+                    <span asp-validation-for="Sexo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Teléfono</label>
+                    <input class="form-control" asp-for="Telefono" />
+                    <span asp-validation-for="Telefono" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Dirección</label>
+                    <input class="form-control" asp-for="Direccion" />
+                    <span asp-validation-for="Direccion" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Alergia Principal</label>
+                    <input class="form-control" asp-for="AlergiaPrincipal" placeholder="Ej: Penicilina, Sulfas..." />
+                    <span asp-validation-for="AlergiaPrincipal" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Guardar Paciente</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

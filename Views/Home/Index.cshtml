@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="mb-4">
+    <h1 class="h3 mb-1">Sistema de Referencias y Contra-referencias Interhospitalarias</h1>
+    <p class="text-muted mb-0">Hospital Regional Docente de Cajamarca</p>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">Dashboard</h5>
+                <p class="text-muted small">Indicadores de referencias por estado, prioridad y red de salud.</p>
+                <a asp-controller="SolicitudReferencia" asp-action="Dashboard" class="btn btn-sm btn-primary">Ir al Dashboard</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">Bandeja de Referencia</h5>
+                <p class="text-muted small">Gestión de solicitudes de referencia y contra-referencia.</p>
+                <a asp-controller="SolicitudReferencia" asp-action="Index" class="btn btn-sm btn-primary">Ir a la bandeja</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">Nueva Referencia</h5>
+                <p class="text-muted small">Registro Maestro-Detalle de una solicitud de referencia.</p>
+                <a asp-controller="SolicitudReferencia" asp-action="Crear" class="btn btn-sm btn-primary">Registrar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">Mantenimientos</h5>
+                <p class="text-muted small">Catálogos: Pacientes, Establecimientos, Especialidades y Personal.</p>
+                <a asp-controller="Paciente" asp-action="Index" class="btn btn-sm btn-outline-primary">Pacientes</a>
+                <a asp-controller="EstablecimientoSalud" asp-action="Index" class="btn btn-sm btn-outline-primary mt-1">Establecimientos</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4" />
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="fw-bold text-uppercase text-muted">Resumen del Sistema</h6>
+        <ul class="mb-0">
+            <li>Gestión de Referencias y Contra-referencias Interhospitalarias del HRC.</li>
+            <li>Patrones: <strong>Strategy</strong> (triaje), <strong>Singleton</strong> (configuración hospitalaria), <strong>Repository / Unit of Work</strong> (acceso a datos) y principios <strong>GRASP</strong>.</li>
+            <li>Relaciones: 1:N (Paciente/Establecimiento/Solicitud-Detalle), 1:1 (Solicitud - Contrareferencia) y N:M (Establecimiento - Especialidad).</li>
+            <li>Máquina de estados: Registrada, En Evaluación, Aceptada / Observada / Rechazada, Contrareferida.</li>
+        </ul>
+    </div>
+</div>

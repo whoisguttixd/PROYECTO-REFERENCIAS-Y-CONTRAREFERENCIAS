@@ -1,0 +1,81 @@
+@model IEnumerable<PROYECTO_REFERENCIAS.Models.Paciente>
+@{
+    ViewData["Title"] = "Pacientes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Listado de Pacientes</h3>
+    <a asp-controller="Paciente" asp-action="Crear" class="btn btn-primary">
+        Nuevo Paciente
+    </a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (ViewData["Mensaje"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @ViewData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input class="form-control" type="search" name="filtro" value="@ViewBag.Filtro" placeholder="DNI, apellidos, nombres o RENAES" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        @if (!string.IsNullOrWhiteSpace(ViewBag.Filtro))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        }
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay pacientes registrados.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>DNI / RUN</th>
+                <th>Paciente</th>
+                <th>Sexo</th>
+                <th>Edad</th>
+                <th>Teléfono</th>
+                <th>RENAES</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td><span class="fw-semibold">@p.Dni</span></td>
+                    <td>
+                        <div class="fw-medium">@p.Nombres</div>
+                        <small class="text-muted">@p.Apellidos</small>
+                    </td>
+                    <td>@(string.IsNullOrWhiteSpace(p.Sexo) ? "-" : p.Sexo)</td>
+                    <td>@p.Edad años</td>
+                    <td>@(string.IsNullOrWhiteSpace(p.Telefono) ? "-" : p.Telefono)</td>
+                    <td>@(string.IsNullOrWhiteSpace(p.CodigoRenaes) ? "-" : p.CodigoRenaes)</td>
+                    <td>
+                        <a asp-controller="Paciente" asp-action="Editar" asp-route-id="@p.IdPaciente" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <a asp-controller="Paciente" asp-action="Eliminar" asp-route-id="@p.IdPaciente" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar paciente @p.Apellidos @p.Nombres (DNI @p.Dni)?');">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

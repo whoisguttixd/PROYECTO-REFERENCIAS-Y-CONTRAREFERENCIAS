@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Usuario";
+}
+<div class="text-center">
+    <h1>
+        Panel del Usuario
+    </h1>
+    <p>
+        Bienvenido <strong>@User.Identity?.Name</strong>
+    </p>
+    <p>
+        Esta página solamente puede ser utilizada por los usuarios con el rol <strong>Usuario</strong>
+    </p>
+</div>

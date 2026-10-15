@@ -1,0 +1,97 @@
+@model PROYECTO_REFERENCIAS.Models.EstablecimientoSalud
+@{
+    ViewData["Title"] = "Asignar Especialidades";
+    var todas = ViewBag.TodasEspecialidades as System.Collections.Generic.IList<PROYECTO_REFERENCIAS.Models.Especialidad> ?? new System.Collections.Generic.List<PROYECTO_REFERENCIAS.Models.Especialidad>();
+}
+
+<a asp-controller="EstablecimientoSalud" asp-action="Index" class="btn btn-outline-secondary mb-2">
+    Volver
+</a>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="small text-muted">Establecimiento</div>
+                <div class="fw-semibold">@Model.NombreCompleto</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted">Código</div>
+                <div class="fw-semibold">@Model.Codigo</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ViewData["Mensaje"] != null)
+{
+    <div class="alert alert-warning">@ViewData["Mensaje"]</div>
+}
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Asignar especialidades al establecimiento</h5>
+    </div>
+    <div class="card-body">
+        @if (!todas.Any())
+        {
+            <div class="alert alert-info">No hay especialidades registradas en el sistema.</div>
+        }
+        else
+        {
+            <form asp-controller="EstablecimientoSalud" asp-action="AsignarEspecialidades" method="post">
+                <input type="hidden" name="id" value="@Model.IdEstablecimiento" />
+                <input type="hidden" name="capacidad" id="h Capacidad" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Especialidades disponibles en el sistema</label>
+                    <div class="row g-2">
+                        @foreach (var esp in todas)
+                        {
+                            var asignada = Model.EstablecimientoEspecialidades.Any(ee => ee.IdEspecialidad == esp.IdEspecialidad);
+                            var checkboxId = $"espec_{esp.IdEspecialidad}";
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="@checkboxId" name="especialidadesSeleccionadas" value="@esp.IdEspecialidad" @(asignada ? "checked disabled" : " ") />
+                                    <label class="form-check-label" for="@checkboxId">
+                                        @esp.Nombre
+                                        <small class="text-muted">(CIE-10: @esp.Codigo)</small>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <small class="text-muted">Las especialidades ya asignadas no se pueden seleccionar de nuevo.</small>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Capacidad de atención</label>
+                        <input class="form-control" type="number" name="capacidad" min="0" max="500" value="10" />
+                        <span class="text-muted small">Número de atenciones por turno / día.</span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Horario de atención</label>
+                        <input class="form-control" name="horario" value="Lunes a Viernes 07:00-17:00" />
+                    </div>
+                </div>
+
+                <div class="col-12 d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary">Asignar Especialidades</button>
+                </div>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
