@@ -3,36 +3,88 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Login</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - Sistema HRC</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- FontAwesome para los íconos institucionales -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body>
-    <div class="row mt-5 justify-content-center">
-        <div class="col-sm-4">
-            <div class="card">
-                <div class="card-header">
-                    Iniciar Sesion
-                </div>
-                <div class="card-body">
-                    <form asp-controller="Login" asp-action="Login" method="post" autocomplete="off">
-                        <input class="form-control mb-3" type="email" placeholder="Correo" asp-for="Correo" />
-                        <input class="form-control mb-3" type="password" placeholder="Contraseña" asp-for="Password" />
-                        <div class="d-grid gap-2 mb-3">
-                            <button class="btn btn-primary" type="submit">Iniciar Sesion</button>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+
+                <!-- Tarjeta principal con diseño moderno y sombras -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                    <!-- Encabezado con identidad visual médica -->
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <div class="mb-2">
+                            <i class="fas fa-hospital-user fa-2x"></i>
                         </div>
-                    </form>
-                    @if (ViewData["Mensaje"] != null)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            @ViewData["Mensaje"]
+                        <h4 class="mb-0 fw-bold">Sistema HRC</h4>
+                        <p class="small mb-0 text-white-50">Hospital Regional Docente de Cajamarca</p>
+                    </div>
+
+                    <!-- Cuerpo del formulario -->
+                    <div class="card-body p-4 bg-white">
+                        <form asp-controller="Login" asp-action="Login" method="post" autocomplete="off">
+
+                            <!-- Campo Correo -->
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold small">Correo Electrónico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted ps-3">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input class="form-control border-start-0 rounded-end-pill py-2 bg-light" type="email" placeholder="correo@ejemplo.com" asp-for="Correo" required />
+                                </div>
+                            </div>
+
+                            <!-- Campo Contraseña -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary fw-semibold small">Contraseña</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted ps-3">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input class="form-control border-start-0 rounded-end-pill py-2 bg-light" type="password" placeholder="••••••••" asp-for="Password" required />
+                                </div>
+                            </div>
+
+                            <!-- Botón de Envío -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-primary btn-lg rounded-pill shadow-sm fw-bold py-2" type="submit">
+                                    Iniciar Sesión
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Alerta de Mensaje de Error (si existe) -->
+                        @if (ViewData["Mensaje"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show text-center small py-2 mt-3" role="alert">
+                                <i class="fas fa-exclamation-circle me-1"></i> @ViewData["Mensaje"]
+                            </div>
+                        }
+
+                        <!-- Enlace de Registro -->
+                        <div class="text-center mt-3">
+                            <p class="small text-muted mb-0">
+                                ¿No tienes una cuenta?
+                                <a asp-controller="Login" asp-action="Registro" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a>
+                            </p>
                         </div>
-                    }
-                    ¿No tienes una cuenta? <a asp-controller="Login" asp-action="Registro">Registrate</a>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
+
 </body>
 </html>
